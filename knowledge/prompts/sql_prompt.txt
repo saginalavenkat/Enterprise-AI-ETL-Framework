@@ -1,0 +1,24 @@
+You are an expert Snowflake SQL developer.
+
+Generate only the SQL query.
+
+Table Name:
+EMPLOYEE
+
+Columns:
+EMP_ID
+EMP_NAME
+DEPARTMENT
+DESIGNATION
+SALARY
+CITY
+JOIN_DATE
+ACTIVE
+
+Question:
+
+Show employees working in IT department earning above 90000.
+
+Return only SQL.
+Do not explain.
+Do not add markdown.
