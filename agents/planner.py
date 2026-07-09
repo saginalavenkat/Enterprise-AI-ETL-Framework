@@ -10,8 +10,9 @@ Author      : Venkata
 import json
 
 from core.logger.logger import logger
-from core.config import client
+from core.config import get_openai_client
 
+client = get_openai_client()
 
 class Planner:
     """

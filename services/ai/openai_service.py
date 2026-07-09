@@ -6,8 +6,9 @@ Purpose     : Centralized OpenAI Service with RAG Integration
 Author      : Venkata
 ===============================================================================
 """
+from core.config.config import get_openai_client
 
-from core.config.config import client
+client = get_openai_client()
 from core.logger.logger import logger
 from knowledge.rag.rag_pipeline import RAGPipeline
 

@@ -7,7 +7,9 @@ Author      : Venkata
 ===============================================================================
 """
 
-from core.config.config import client
+from core.config.config import get_openai_client
+
+client = get_openai_client()
 from core.logger.logger import logger
 
 

@@ -11,8 +11,9 @@ from abc import ABC, abstractmethod
 
 from core.logger.logger import logger
 from knowledge.rag.rag_pipeline import RAGPipeline
-from core.config.config import client
+from core.config.config import get_openai_client
 
+client = get_openai_client()
 
 class BaseAgent(ABC):
     """

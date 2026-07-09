@@ -1,4 +1,4 @@
-from .config import client
+from .config import get_openai_client
 
 from .secrets import (
     JIRA_URL,
@@ -20,7 +20,8 @@ from .secrets import (
 )
 
 __all__ = [
-    "client",
+
+    "get_openai_client",
 
     "JIRA_URL",
     "JIRA_USERNAME",
