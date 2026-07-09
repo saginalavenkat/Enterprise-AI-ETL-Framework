@@ -15,6 +15,26 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      JIRA_URL: ${{ secrets.JIRA_URL }}
+      JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
+      JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+
+      SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+
     steps:
 
       - name: Checkout Repository
@@ -30,6 +50,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Create secrets.py
+        run: |
+          cp core/config/secrets_template.py core/config/secrets.py
+
       - name: Verify Python Version
         run: python --version
 
@@ -43,3 +67,7 @@ jobs:
       - name: Run Unit Tests
         run: |
           pytest tests
+
+      - name: Run Framework
+        run: |
+          python main.py
