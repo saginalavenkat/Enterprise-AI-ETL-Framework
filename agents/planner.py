@@ -14,6 +14,7 @@ from core.config import get_openai_client
 
 client = get_openai_client()
 
+
 class Planner:
     """
     Creates an execution plan for the Workflow Manager.
@@ -73,6 +74,7 @@ Available Agents
 - documentation
 - root_cause
 - defect_analysis
+- jira
 
 Return ONLY JSON.
 
@@ -115,10 +117,133 @@ Question
 
         question = question.lower()
 
-        # Complete Workflow
+        plan = []
 
-        if any(word in question for word in
-               ["complete", "full", "end to end"]):
+        # ---------------------------------------------------------
+        # Requirement
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "requirement",
+            "business rule"
+        ]):
+            plan.append("requirement")
+
+        # ---------------------------------------------------------
+        # Mapping
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "mapping",
+            "sttm"
+        ]):
+            plan.append("mapping_analysis")
+
+        # ---------------------------------------------------------
+        # Test Cases
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "test case",
+            "testcase",
+            "etl test"
+        ]):
+            if "requirement" not in plan:
+                plan.append("requirement")
+
+            plan.append("test_case")
+
+        # ---------------------------------------------------------
+        # Test Data
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "test data",
+            "sample data"
+        ]):
+            plan.append("test_data")
+
+        # ---------------------------------------------------------
+        # SQL
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "sql",
+            "query",
+            "select",
+            "insert",
+            "update",
+            "delete"
+        ]):
+            plan.append("sql")
+
+        # ---------------------------------------------------------
+        # Validation
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "validate",
+            "validation",
+            "verify",
+            "check",
+            "etl load",
+            "snowflake",
+            "compare"
+        ]):
+
+            if "sql" not in plan:
+                plan.append("sql")
+
+            plan.append("validation")
+
+        # ---------------------------------------------------------
+        # Root Cause
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "root cause",
+            "rca"
+        ]):
+            plan.append("root_cause")
+
+        # ---------------------------------------------------------
+        # Defect Analysis
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "defect",
+            "bug",
+            "failure"
+        ]):
+            plan.append("defect_analysis")
+
+        # ---------------------------------------------------------
+        # Jira
+        # ---------------------------------------------------------
+
+        if "jira" in question:
+            plan.append("jira")
+
+        # ---------------------------------------------------------
+        # Documentation
+        # ---------------------------------------------------------
+
+        if any(word in question for word in [
+            "documentation",
+            "document",
+            "report"
+        ]):
+            plan.append("documentation")
+
+        # ---------------------------------------------------------
+        # Complete Workflow Detection
+        # ---------------------------------------------------------
+
+        if (
+            "validate" in question
+            and "sql" in question
+            and "test" in question
+        ):
 
             return [
                 "requirement",
@@ -132,74 +257,16 @@ Question
                 "documentation"
             ]
 
-        # Requirement
-
-        if any(word in question for word in
-               ["requirement", "business rule"]):
-
-            return ["requirement"]
-
-        # Mapping
-
-        if any(word in question for word in
-               ["mapping", "sttm"]):
-
-            return ["mapping_analysis"]
-
-        # Test Cases
-
-        if any(word in question for word in
-               ["test case", "testcase"]):
-
-            return ["requirement", "test_case"]
-
-        # Test Data
-
-        if any(word in question for word in
-               ["test data", "sample data"]):
-
-            return ["test_data"]
-
-        # SQL
-
-        if any(word in question for word in
-               ["sql", "query", "select", "insert",
-                "update", "delete",
-                "employee", "table"]):
-
-            return ["sql"]
-
-        # Validation
-
-        if any(word in question for word in
-               ["validate", "validation", "verify", "check"]):
-
-            return ["sql", "validation"]
-
-        # Root Cause
-
-        if any(word in question for word in
-               ["root cause", "rca"]):
-
-            return ["root_cause"]
-
-        # Defect
-
-        if any(word in question for word in
-               ["defect", "bug"]):
-
-            return ["defect_analysis"]
-
-        # Documentation
-
-        if any(word in question for word in
-               ["documentation", "document", "report"]):
-
-            return ["documentation"]
-
+        # ---------------------------------------------------------
         # Intelligent Default
+        # ---------------------------------------------------------
 
-        return ["requirement"]
+        if not plan:
+            plan.append("requirement")
+
+        # Remove duplicates while preserving order
+        return list(dict.fromkeys(plan))
+
 
 # -----------------------------------------------------------------
 # Testing

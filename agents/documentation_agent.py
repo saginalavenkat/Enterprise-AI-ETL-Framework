@@ -132,7 +132,7 @@ class DocumentationAgent(BaseAgent):
         report = self.ask_llm(prompt)
 
         # Save report in workflow context
-        context.documentation = report
+        context.documentation = report or "Mock Documentation Generated"
 
         # Save Markdown report and store the file path
         context.report_file = self.save_markdown(context)

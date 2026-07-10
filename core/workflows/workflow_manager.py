@@ -38,6 +38,12 @@ class WorkflowManager:
 
         plan = self.planner.create_plan(question)
 
+        logger.info("=" * 80)
+        logger.info("Execution Plan: %s", plan)
+        logger.info("=" * 80)
+
+        print("\nExecution Plan:", plan)
+
         logger.info("Execution Plan : %s", plan)
 
         for step in plan:
@@ -50,6 +56,7 @@ class WorkflowManager:
                 continue
 
             logger.info("Executing %s Agent", step)
+            print(f"Executing Agent -> {step}")
 
             context = agent.execute(context)
 
