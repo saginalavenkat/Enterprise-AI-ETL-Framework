@@ -142,6 +142,7 @@ class DocumentationAgent(BaseAgent):
 
         # Save Markdown report and store the file path
         context.report_file = self.save_markdown(context)
+        email_service = EmailService()
         EmailService().send_email(to_email=EmailService().report_email, subject="Enterprise AI ETL Execution Report", body=context.documentation)
 
         logger.info("Documentation Generated Successfully.")

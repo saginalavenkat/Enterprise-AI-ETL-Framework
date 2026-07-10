@@ -23,7 +23,7 @@ class EmailService:
         self.smtp_port = int(os.getenv("SMTP_PORT", 587))
         self.email_user = os.getenv("EMAIL_USER")
         self.email_password = os.getenv("EMAIL_PASSWORD")
-        self.report_email = os.getenv("REPORT_EMAIL")
+        self.report_email = os.getenv("REPORT_EMAIL", self.email_user)
 
         print("=" * 60)
         print("SMTP_SERVER   :", self.smtp_server)
@@ -38,6 +38,18 @@ class EmailService:
     def send_email(self, to_email, subject, body):
 
         try:
+            # Use EMAIL_USER if REPORT_EMAIL is missing
+            to_email = to_email or self.email_user
+
+            if not to_email:
+                print("REPORT_EMAIL is not configured.")
+                return False
+
+            msg = MIMEMultipart()
+
+            msg["From"] = self.email_user
+            msg["To"] = to_email
+            msg["Subject"] = subject
 
             msg = MIMEMultipart()
 
