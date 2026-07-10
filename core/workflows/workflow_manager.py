@@ -27,7 +27,7 @@ class WorkflowManager:
         self.agent_registry = AgentRegistry(self.rag_pipeline)
 
         self.monitor = FrameworkMonitor()
-
+        self.monitor.start()
     # ------------------------------------------------------------
 
     def execute(self, question):
