@@ -58,7 +58,15 @@ class WorkflowManager:
             logger.info("Executing %s Agent", step)
             print(f"Executing Agent -> {step}")
 
-            context = agent.execute(context)
+            try:
+
+                context = agent.execute(context)
+
+            except Exception as ex:
+
+                logger.exception("Agent %s failed", step)
+
+                raise
 
         logger.info("Workflow Completed.")
 

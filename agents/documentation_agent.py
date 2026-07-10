@@ -64,6 +64,10 @@ class DocumentationAgent(BaseAgent):
         return str(report_path)
 
     def execute(self, context):
+        print("=" * 80)
+        print("Documentation Agent Started")
+        print("=" * 80)
+
         logger.info("Documentation Agent Started.")
 
         prompt = f"""
@@ -130,15 +134,18 @@ class DocumentationAgent(BaseAgent):
         Prepare a professional report suitable for management.
         """
         report = self.ask_llm(prompt)
+        print("LLM Report:", report)
 
         # Save report in workflow context
         context.documentation = report or "Mock Documentation Generated"
+        print("Documentation Stored:", context.documentation)
 
         # Save Markdown report and store the file path
         context.report_file = self.save_markdown(context)
         EmailService().send_email(to_email=EmailService().report_email, subject="Enterprise AI ETL Execution Report", body=context.documentation)
 
         logger.info("Documentation Generated Successfully.")
+        print("Documentation Agent Completed")
 
         return context
 # ------------------------------------------------------------
