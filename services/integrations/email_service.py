@@ -8,6 +8,8 @@ import traceback
 import os
 import smtplib
 from dotenv import load_dotenv
+from email.mime.base import MIMEBase
+from email import encoders
 
 load_dotenv()
 
@@ -35,11 +37,11 @@ class EmailService:
 
     # ------------------------------------------------------------------
 
-    def send_email(self, to_email, subject, body):
+    def send_email(self, to_email, subject, body, attachments=None):
 
         try:
-            # Use EMAIL_USER if REPORT_EMAIL is missing
-            to_email = to_email or self.email_user
+
+            to_email = to_email or self.report_email
 
             if not to_email:
                 print("REPORT_EMAIL is not configured.")
@@ -51,13 +53,27 @@ class EmailService:
             msg["To"] = to_email
             msg["Subject"] = subject
 
-            msg = MIMEMultipart()
-
-            msg["From"] = self.email_user
-            msg["To"] = self.report_email
-            msg["Subject"] = subject
-
             msg.attach(MIMEText(body, "plain"))
+
+            # -----------------------------------------
+            # Attach files
+            # -----------------------------------------
+
+            if attachments:
+
+                for file_path in attachments:
+
+                    if os.path.exists(file_path):
+                        with open(file_path, "rb") as attachment:
+                            part = MIMEBase("application", "octet-stream")
+
+                            part.set_payload(attachment.read())
+
+                        encoders.encode_base64(part)
+
+                        part.add_header("Content-Disposition", f'attachment; filename="{os.path.basename(file_path)}"')
+
+                        msg.attach(part)
 
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
 
@@ -71,17 +87,8 @@ class EmailService:
 
             return True
 
-
-        except Exception as e:
-
-            print("\nFULL ERROR")
-
-            print("=" * 60)
+        except Exception:
 
             traceback.print_exc()
-
-            print("=" * 60)
-
-            print(e)
 
             return False

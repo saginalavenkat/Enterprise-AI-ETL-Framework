@@ -55,7 +55,14 @@ class DocumentationAgent(BaseAgent):
     ## Documentation
 
     {context.documentation}
-    """
+    
+    ## Defect Analysis
+
+    {context.defect_analysis}
+
+    ## Jira Issue
+
+    {context.jira_issue}"""
 
         report_path.write_text(content, encoding="utf-8")
 
@@ -144,7 +151,23 @@ class DocumentationAgent(BaseAgent):
         # Save Markdown report and store the file path
         context.report_file = self.save_markdown(context)
         email_service = EmailService()
-        EmailService().send_email(to_email=EmailService().report_email, subject="Enterprise AI ETL Execution Report", body=context.documentation)
+
+        email_body = f"""
+        Enterprise AI ETL Framework Execution Completed
+
+        Requirement      : Completed
+        Test Cases       : Generated
+        SQL              : Generated
+        Validation       : Completed
+        Jira Issue       : {context.jira_issue}
+
+        Please find the attached execution report.
+
+        Regards,
+        Enterprise AI ETL Framework
+        """
+
+        email_service.send_email(to_email=email_service.report_email, subject="Enterprise AI ETL Execution Report", body=email_body, attachments=[context.report_file])
 
         logger.info("Documentation Generated Successfully.")
         print("Documentation Agent Completed")
