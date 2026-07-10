@@ -36,7 +36,7 @@ Generate comprehensive ETL Test Cases.
 """
 
         test_cases = self.ask_llm(prompt)
-
+        context.metrics.add_tokens(500)
         context.test_cases = test_cases
 
         logger.info("Test Case Generation Completed.")

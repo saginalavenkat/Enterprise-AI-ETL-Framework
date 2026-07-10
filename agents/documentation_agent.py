@@ -134,6 +134,7 @@ class DocumentationAgent(BaseAgent):
         Prepare a professional report suitable for management.
         """
         report = self.ask_llm(prompt)
+        context.metrics.add_tokens(500)
         print("LLM Report:", report)
 
         # Save report in workflow context

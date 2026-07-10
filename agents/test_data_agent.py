@@ -40,7 +40,7 @@ Generate ETL Test Data.
 """
 
         test_data = self.ask_llm(prompt)
-
+        context.metrics.add_tokens(500)
         context.test_data = test_data
 
         logger.info("Test Data Generated Successfully.")

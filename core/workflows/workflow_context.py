@@ -6,7 +6,7 @@ Purpose     : Shared Workflow Context
 Author      : Venkata
 ===============================================================================
 """
-
+from core.metrics.framework_metrics import FrameworkMetrics
 
 class WorkflowContext:
 
@@ -18,6 +18,8 @@ class WorkflowContext:
     """
 
     def __init__(self, question: str):
+
+        self.metrics = FrameworkMetrics()
 
         self.question = question
 

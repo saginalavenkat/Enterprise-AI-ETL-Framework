@@ -26,7 +26,7 @@ class ValidationAgent(BaseAgent):
         prompt = f""" Requirement {context.requirement} Generated SQL {context.generated_sql} Database Result {context.query_result} Generate Validation Summary."""
 
         validation = self.ask_llm(prompt)
-
+        context.metrics.add_tokens(500)
         context.validation = validation
 
         logger.info("Validation Completed.")

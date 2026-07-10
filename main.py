@@ -77,11 +77,25 @@ def main():
 
         logger.exception(error)
 
+
     finally:
 
-        monitor.stop()
-        monitor.save_metrics()
-        monitor.display_metrics()
+        if "context" in locals() and hasattr(context, "monitor"):
+
+            context.monitor.stop()
+
+            context.monitor.save_metrics()
+
+            context.monitor.display_metrics()
+
+
+        else:
+
+            monitor.stop()
+
+            monitor.save_metrics()
+
+            monitor.display_metrics()
 
     logger.info("Framework Execution Completed Successfully.")
 

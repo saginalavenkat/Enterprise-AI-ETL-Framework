@@ -80,7 +80,7 @@ Return concise enterprise output.
 """
 
         analysis = self.ask_llm(prompt)
-
+        context.metrics.add_tokens(500)
         # ------------------------------------------------------------
         # Store structured result
         # ------------------------------------------------------------

@@ -37,7 +37,7 @@ Analyze the mapping document and identify:
 """
 
         mapping = self.ask_llm(prompt)
-
+        context.metrics.add_tokens(500)
         context.mapping = mapping
 
         logger.info("Mapping Analysis Completed.")

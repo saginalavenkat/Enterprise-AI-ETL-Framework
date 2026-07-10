@@ -27,7 +27,7 @@ class RequirementAgent(BaseAgent):
         logger.info("Requirement Agent Started.")
 
         requirement = self.ask_llm(context.question)
-
+        context.metrics.add_tokens(500)
         context.requirement = requirement
 
         logger.info("Requirement Analysis Completed.")

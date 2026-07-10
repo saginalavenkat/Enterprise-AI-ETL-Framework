@@ -54,7 +54,7 @@ class SQLAgent(BaseAgent):
         prompt = f"""Requirement {context.requirement} Mapping {context.mapping} Test Cases {context.test_cases} Generate SQL Query only."""
 
         generated_sql = self.ask_llm(prompt)
-
+        context.metrics.add_tokens(500)
         generated_sql = self.clean_sql(generated_sql)
 
         logger.info("Generated SQL:\n%s", generated_sql)
