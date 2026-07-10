@@ -64,6 +64,6 @@ jobs:
           python -c "import integrations"
           python -c "import tools"
 
-      - name: Run Unit Tests
+      - name: Run End-to-End Workflow
         run: |
-          pytest tests
+          pytest tests/test_end_to_end_workflow.py -s -v
