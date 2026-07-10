@@ -10,6 +10,7 @@ Author      : Venkata
 from agents.base_agent import BaseAgent
 from core.logger.logger import logger
 from pathlib import Path
+from datetime import datetime
 from services.integrations.email_service import EmailService
 
 class DocumentationAgent(BaseAgent):
@@ -23,7 +24,9 @@ class DocumentationAgent(BaseAgent):
     # ------------------------------------------------------------
     def save_markdown(self, context):
 
-        report_path = self.output_folder / "ETL_Test_Report.md"
+        filename = datetime.now().strftime("ETL_Test_Report_%Y%m%d_%H%M%S.md")
+
+        report_path = self.output_folder / filename
 
         content = f"""
     # Enterprise AI ETL Execution Report
@@ -152,6 +155,16 @@ class DocumentationAgent(BaseAgent):
         context.report_file = self.save_markdown(context)
         email_service = EmailService()
 
+        # Extract only Jira Issue Key
+        jira_key = "N/A"
+
+        if context.jira_issue:
+
+            try:
+                jira_key = context.jira_issue.result.get("issue_key", "N/A")
+            except Exception:
+                jira_key = str(context.jira_issue)
+
         email_body = f"""
         Enterprise AI ETL Framework Execution Completed
 
@@ -159,7 +172,7 @@ class DocumentationAgent(BaseAgent):
         Test Cases       : Generated
         SQL              : Generated
         Validation       : Completed
-        Jira Issue       : {context.jira_issue}
+        Jira Issue       : {jira_key}
 
         Please find the attached execution report.
 
