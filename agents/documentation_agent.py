@@ -10,6 +10,7 @@ Author      : Venkata
 from agents.base_agent import BaseAgent
 from core.logger.logger import logger
 from pathlib import Path
+from services.integrations.email_service import EmailService
 
 class DocumentationAgent(BaseAgent):
 
@@ -135,6 +136,7 @@ class DocumentationAgent(BaseAgent):
 
         # Save Markdown report and store the file path
         context.report_file = self.save_markdown(context)
+        EmailService().send_email(to_email=EmailService().report_email, subject="Enterprise AI ETL Execution Report", body=context.documentation)
 
         logger.info("Documentation Generated Successfully.")
 
