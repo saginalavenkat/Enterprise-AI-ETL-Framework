@@ -12,7 +12,6 @@ from core.logger.logger import logger
 from agents.planner import Planner
 from knowledge.rag.rag_pipeline import RAGPipeline
 from agents.agent_registry import AgentRegistry
-from core.monitoring.monitor import FrameworkMonitor
 
 class WorkflowManager:
 
@@ -26,8 +25,6 @@ class WorkflowManager:
 
         self.agent_registry = AgentRegistry(self.rag_pipeline)
 
-        self.monitor = FrameworkMonitor()
-        self.monitor.start()
     # ------------------------------------------------------------
 
     def execute(self, question):
@@ -63,20 +60,12 @@ class WorkflowManager:
             try:
 
                 context = agent.execute(context)
-                self.monitor.service_success()
-                self.monitor.update_tokens(500)
-                self.monitor.update_cost(0.001)
                 #context.metrics.service_success()
 
             except Exception:
-
-                self.monitor.service_failed()
-
                 raise
 
         logger.info("Workflow Completed.")
-
-        context.monitor = self.monitor
 
         return context
 # ------------------------------------------------------------
