@@ -239,12 +239,7 @@ Question
         # Complete Workflow Detection
         # ---------------------------------------------------------
 
-        if (
-            "validate" in question
-            and "sql" in question
-            and "test" in question
-        ):
-
+        if "complete" in question or "package" in question or "end to end" in question:
             return [
                 "requirement",
                 "mapping_analysis",
