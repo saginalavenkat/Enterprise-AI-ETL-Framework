@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: enterprise-ai-etl-framework
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: enterprise-ai-etl-framework
+
+  template:
+    metadata:
+      labels:
+        app: enterprise-ai-etl-framework
+
+    spec:
+      containers:
+      - name: enterprise-ai-etl-framework
+        image: saginalavenkat/enterprise-ai-etl-framework:1.0
+        imagePullPolicy: Always
+
+        envFrom:
+        - secretRef:
+            name: enterprise-ai-etl-secret
+
+        - configMapRef:
+            name: enterprise-ai-etl-config

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: enterprise-ai-etl-config
+
+data:
+
+  SMTP_SERVER: smtp.gmail.com
+
+  SMTP_PORT: "587"
+
+  EMAIL_USER: saginalavenkat@gmail.com
+
+  REPORT_EMAIL: saginalavenkat@gmail.com
+
+  JIRA_URL: https://saginalavenkat.atlassian.net
+
+  JIRA_EMAIL: saginalavenkat@gmail.com
+
+  JIRA_PROJECT_KEY: SCRUM

@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environment
+.venv/
+venv/
+
+# Git
+.git/
+.github/
+
+# IDE
+.idea/
+.vscode/
+
+# Pytest
+.pytest_cache/
+
+# Reports
+resources/reports/
+resources/outputs/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env

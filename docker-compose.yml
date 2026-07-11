@@ -1,0 +1,12 @@
+services:
+
+  enterprise-ai-etl-framework:
+
+    build: .
+
+    container_name: enterprise-ai-etl-framework
+
+    env_file:
+      - .env
+
+    command: pytest tests/test_end_to_end_workflow.py -s -v

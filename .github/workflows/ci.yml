@@ -34,6 +34,7 @@ jobs:
       SMTP_PORT: ${{ secrets.SMTP_PORT }}
       EMAIL_USER: ${{ secrets.EMAIL_USER }}
       EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+      REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
 
     steps:
 
@@ -67,3 +68,17 @@ jobs:
       - name: Run End-to-End Workflow
         run: |
           pytest tests/test_end_to_end_workflow.py -s -v
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/enterprise-ai-etl-framework:latest .
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/enterprise-ai-etl-framework:latest
