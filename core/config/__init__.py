@@ -1,42 +1,12 @@
+"""
+===============================================================================
+Package : core.config
+Purpose : Configuration package for Enterprise AI ETL Framework
+===============================================================================
+"""
+
 from .config import get_openai_client
 
-from .secrets import (
-    JIRA_URL,
-    JIRA_USERNAME,
-    JIRA_API_TOKEN,
-
-    SMTP_SERVER,
-    SMTP_PORT,
-    EMAIL_USER,
-    EMAIL_PASSWORD,
-
-    SNOWFLAKE_ACCOUNT,
-    SNOWFLAKE_USER,
-    SNOWFLAKE_PASSWORD,
-    SNOWFLAKE_DATABASE,
-    SNOWFLAKE_SCHEMA,
-    SNOWFLAKE_WAREHOUSE,
-    SNOWFLAKE_ROLE,
-)
-
 __all__ = [
-
     "get_openai_client",
-
-    "JIRA_URL",
-    "JIRA_USERNAME",
-    "JIRA_API_TOKEN",
-
-    "SMTP_SERVER",
-    "SMTP_PORT",
-    "EMAIL_USER",
-    "EMAIL_PASSWORD",
-
-    "SNOWFLAKE_ACCOUNT",
-    "SNOWFLAKE_USER",
-    "SNOWFLAKE_PASSWORD",
-    "SNOWFLAKE_DATABASE",
-    "SNOWFLAKE_SCHEMA",
-    "SNOWFLAKE_WAREHOUSE",
-    "SNOWFLAKE_ROLE",
 ]

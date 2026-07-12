@@ -8,14 +8,13 @@ Author      : Venkata
 """
 
 import requests
+import os
 
 from core.logger.logger import logger
-from core.config.secrets import (
-    JIRA_URL,
-    JIRA_USERNAME,
-    JIRA_API_TOKEN
-)
 
+JIRA_URL = os.getenv("JIRA_URL")
+JIRA_USERNAME = os.getenv("JIRA_USERNAME")
+JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
 
 class JiraService:
 

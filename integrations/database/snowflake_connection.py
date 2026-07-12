@@ -8,13 +8,19 @@ Author      : Venkata
 """
 
 import snowflake.connector
+import os
 
 from core.logger.logger import logger
 
 from integrations.database.database_connection import DatabaseConnection
 
-from core.config.secrets import (SNOWFLAKE_ACCOUNT, SNOWFLAKE_USER, SNOWFLAKE_PASSWORD, SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA, SNOWFLAKE_WAREHOUSE, SNOWFLAKE_ROLE)
-
+SNOWFLAKE_ACCOUNT = os.getenv("SNOWFLAKE_ACCOUNT")
+SNOWFLAKE_USER = os.getenv("SNOWFLAKE_USER")
+SNOWFLAKE_PASSWORD = os.getenv("SNOWFLAKE_PASSWORD")
+SNOWFLAKE_DATABASE = os.getenv("SNOWFLAKE_DATABASE")
+SNOWFLAKE_SCHEMA = os.getenv("SNOWFLAKE_SCHEMA")
+SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE")
+SNOWFLAKE_ROLE = os.getenv("SNOWFLAKE_ROLE")
 
 class SnowflakeConnection(DatabaseConnection):
 

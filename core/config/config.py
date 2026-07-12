@@ -1,7 +1,13 @@
 import os
+
+from dotenv import load_dotenv
 from openai import OpenAI
 
+# Load environment variables from .env
+load_dotenv()
+
 _client = None
+
 
 def get_openai_client():
     global _client
@@ -10,10 +16,6 @@ def get_openai_client():
         _client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     return _client
-
-
-
-
 
 
  # creates: Connection To ChatGPT - api_key: As a QA Lead, you may never actually see the raw key.

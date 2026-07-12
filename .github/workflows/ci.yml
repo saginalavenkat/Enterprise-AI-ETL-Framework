@@ -51,10 +51,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create secrets.py
-        run: |
-          cp core/config/secrets_template.py core/config/secrets.py
-
       - name: Verify Python Version
         run: python --version
 
