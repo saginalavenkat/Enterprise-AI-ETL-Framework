@@ -15,31 +15,41 @@ from integrations.mcp.tool_call import ToolCall
 
 
 class JiraAgent(BaseAgent):
+    """
+    AI Agent responsible for creating Jira issues
+    for ETL validation failures.
+    """
 
-    def __init__(self, rag_pipeline=None):
+    def __init__(
+            self,
+            rag_pipeline=None,
+            client=None,
+            mcp_client=None
+    ):
 
-        super().__init__("Jira Agent", rag_pipeline)
+        super().__init__(
+            agent_name="Jira Agent",
+            rag_pipeline=rag_pipeline,
+            client=client
+        )
 
-        self.mcp_client = MCPClient()
+        self.mcp_client = mcp_client or MCPClient()
 
-        logger.info("Jira Agent Initialized.")
-
-    # -----------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Execute
+    # ------------------------------------------------------------------
 
     def execute(self, context):
 
+        logger.info("=" * 80)
         logger.info("Jira Agent Started.")
+        logger.info("=" * 80)
 
-        # No defect found → Skip Jira creation
         if context.defect_analysis is None:
 
             logger.info("No defect detected. Skipping Jira creation.")
 
             return context
-
-        # -------------------------------------------------------------
-        # Read defect information
-        # -------------------------------------------------------------
 
         summary = context.defect_analysis.get(
             "summary",
@@ -67,70 +77,32 @@ Severity : {severity}
 
 Priority : {priority}
 
-Generated Automatically by Enterprise AI ETL Framework
+Generated Automatically by Enterprise AI ETL Framework.
 """
 
-        # -------------------------------------------------------------
-        # Create MCP Tool Call
-        # -------------------------------------------------------------
-
         tool_call = ToolCall(
-
             tool_name="jira",
-
             arguments={
-
                 "action": "create_issue",
-
                 "project": "SCRUM",
-
                 "summary": summary,
-
                 "description": description,
+                "issue_type": "Task", "monitor": context.monitor})
 
-                "issue_type": "Task"
+        logger.info("Creating Jira issue using MCP...")
 
-            }
+        try:
 
-        )
+            response = self.mcp_client.execute(tool_call)
 
-        # -------------------------------------------------------------
-        # Execute Jira Tool
-        # -------------------------------------------------------------
+            context.jira_issue = response
 
-        response = self.mcp_client.execute(tool_call)
+            logger.info("Jira Issue Created Successfully.")
 
-        context.jira_issue = response
+        except Exception:
 
-        logger.info("Jira Issue Created Successfully.")
+            logger.exception("Failed to create Jira issue.")
+
+            raise
 
         return context
-
-
-# ---------------------------------------------------------------------
-# Testing
-# ---------------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    from core.workflows.workflow_context import WorkflowContext
-
-    context = WorkflowContext("Validation Failure")
-
-    context.defect_analysis = {
-
-        "summary": "Salary Validation Failed",
-
-        "description": "Employee salary mismatch found.",
-
-        "severity": "High",
-
-        "priority": "High"
-
-    }
-
-    agent = JiraAgent()
-
-    context = agent.execute(context)
-
-    print(context.to_dict())

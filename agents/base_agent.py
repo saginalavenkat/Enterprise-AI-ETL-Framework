@@ -10,89 +10,153 @@ Author      : Venkata
 from abc import ABC, abstractmethod
 
 from core.logger.logger import logger
-from knowledge.rag.rag_pipeline import RAGPipeline
 from core.config.config import get_openai_client
 
-client = get_openai_client()
+from knowledge.rag.rag_pipeline import RAGPipeline
+
 
 class BaseAgent(ABC):
     """
-    Base class for all AI Agents.
-    Every AI Agent inherits from this class.
+    Base class for all Enterprise AI Agents.
+
+    Responsibilities
+    ----------------
+    - Retrieve project context using RAG
+    - Build final prompt
+    - Call GPT
+    - Handle GPT failures
+    - Return mock response when GPT is unavailable
+
+    Child classes only need to implement execute().
     """
 
-    def __init__(self, agent_name, rag_pipeline=None):
+    def __init__(self, agent_name: str, rag_pipeline=None, client=None):
 
         self.agent_name = agent_name
 
-        if rag_pipeline is None:
-            self.rag_pipeline = RAGPipeline()
-        else:
-            self.rag_pipeline = rag_pipeline
+        self.rag_pipeline = rag_pipeline or RAGPipeline()
 
-        logger.info(f"{self.agent_name} Initialized.")
+        self.client = client or get_openai_client()
 
-    # -----------------------------------------------------------------
+        logger.info("%s Initialized.", self.agent_name)
+
+    # ------------------------------------------------------------------
+    # Retrieve Context
+    # ------------------------------------------------------------------
 
     def retrieve_context(self, question: str) -> str:
-        """
-        Retrieves project context using RAG.
-        """
 
-        logger.info(f"{self.agent_name} : Retrieving Context")
+        logger.info("%s : Retrieving Context", self.agent_name)
 
         return self.rag_pipeline.retrieve_context(question)
 
-    # -----------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Build Prompt
+    # ------------------------------------------------------------------
 
-    def build_prompt(self, question: str) -> str:
-        """
-        Builds final prompt using RAG.
-        """
+    def build_prompt(self, question: str, context) -> str:
 
-        logger.info(f"{self.agent_name} : Building Prompt")
+        logger.info("Embedding Present: %s", context is not None and context.embedding is not None)
 
-        return self.rag_pipeline.execute(question)
+        logger.info("%s : Building Prompt", self.agent_name)
 
-    # -----------------------------------------------------------------
+        return self.rag_pipeline.execute(question, embedding=context.embedding, monitor=context.monitor)
 
-    def ask_llm(self, question: str) -> str:
-        """
-        Sends the RAG prompt to GPT.
-        """
+    # ------------------------------------------------------------------
+    # Ask LLM
+    # ------------------------------------------------------------------
 
-        logger.info(f"{self.agent_name} : Calling GPT")
+    def ask_llm(self, question, context=None):
 
-        final_prompt = self.build_prompt(question)
+        logger.info("%s : Calling GPT", self.agent_name)
+
+        # ---------------------------------------------------------
+        # Reuse Cached RAG Prompt
+        # ---------------------------------------------------------
+        if context:
+
+            if context.rag_context is None:
+
+                logger.info("%s : Building Prompt", self.agent_name)
+
+                context.rag_context = self.build_prompt(
+                    question,
+                    context
+                )
+
+            else:
+
+                logger.info(
+                    "%s : Using Cached Prompt",
+                    self.agent_name
+                )
+
+            final_prompt = context.rag_context
+
+        else:
+
+            final_prompt = self.build_prompt(
+                question,
+                context
+            )
 
         try:
 
-            response = client.chat.completions.create(model = "gpt-4o", temperature = 0, messages = [{"role": "user", "content": final_prompt}])
+            response = self.client.chat.completions.create(
+                model="gpt-4.1",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": final_prompt
+                    }
+                ]
+            )
+
+            usage = response.usage
+
+            if context and context.monitor:
+
+                context.monitor.llm_call()
+
+                if usage:
+                    context.monitor.update_tokens(
+                        usage.total_tokens
+                    )
 
             return response.choices[0].message.content
 
-        except Exception as error:
+        except Exception:
 
-            logger.warning(f"GPT Call Failed : {error}")
-            logger.warning("Using Mock GPT Response")
+            logger.exception(
+                "%s : GPT Call Failed.",
+                self.agent_name
+            )
 
-            return self.get_mock_response()
+            logger.warning(
+                "%s : Using Mock GPT Response.",
+                self.agent_name
+            )
 
-    # -----------------------------------------------------------------
+            if context and context.monitor:
+                context.monitor.llm_call()
+
+            return "Mock Response"
+
+    # ------------------------------------------------------------------
+    # Mock Response
+    # ------------------------------------------------------------------
 
     def get_mock_response(self):
-        """
-        Default mock response.
-        Child agents should override this method if needed.
-        """
 
         return "Mock Response"
 
-    # -----------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Execute
+    # ------------------------------------------------------------------
 
     @abstractmethod
-    def execute(self, question: str):
+    def execute(self, context):
         """
-        Every child Agent MUST implement execute().
+        Every Business Agent must implement execute().
         """
         pass

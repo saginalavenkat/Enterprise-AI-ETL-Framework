@@ -102,13 +102,3 @@ class DocumentLoader:
 
             return file.read()
 
-if __name__ == "__main__":
-    loader = DocumentLoader()
-    sttm = loader.load_excel("STTM.xlsx")
-    print(sttm[:1000])
-
-    rules = loader.load_docx("Business_Rules.docx")
-    print(rules[:1000])
-
-    design = loader.load_pdf("Design_Document.pdf")
-    print(design[:1000])

@@ -36,8 +36,8 @@ Analyze the mapping document and identify:
 - Business Rules
 """
 
-        mapping = self.ask_llm(prompt)
-        context.metrics.add_tokens(500)
+        mapping = self.ask_llm(prompt, context)
+        context.monitor.update_tokens(500)
         context.mapping = mapping
 
         logger.info("Mapping Analysis Completed.")
@@ -45,20 +45,3 @@ Analyze the mapping document and identify:
         return context
 
 
-# ------------------------------------------------------------
-# Testing
-# ------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    from core.workflows.workflow_context import WorkflowContext
-
-    agent = MappingAnalysisAgent()
-
-    context = WorkflowContext("Generate Mapping")
-
-    context.requirement = "Employee data should be validated."
-
-    context = agent.execute(context)
-
-    print(context.to_dict())

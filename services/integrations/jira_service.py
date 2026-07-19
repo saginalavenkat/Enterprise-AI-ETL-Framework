@@ -38,8 +38,7 @@ class JiraService:
             project,
             summary,
             description,
-            issue_type="Bug"
-    ):
+            issue_type="Bug", monitor=None):
 
         logger.info("Creating Jira Issue...")
 
@@ -97,17 +96,8 @@ class JiraService:
 
         }
 
-        response = requests.post(
+        response = requests.post(url, json=payload, auth=self.auth, headers=self.headers)
 
-            url,
-
-            json=payload,
-
-            auth=self.auth,
-
-            headers=self.headers
-
-        )
         print("=" * 80)
         print("URL")
         print(url)
@@ -123,7 +113,11 @@ class JiraService:
         print("=" * 80)
         print("RESPONSE")
         print(response.text)
+
         response.raise_for_status()
+
+        if monitor:
+            monitor.jira_issue_created()
 
         issue = response.json()
 

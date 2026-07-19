@@ -19,7 +19,7 @@ class DatabaseService:
 
     # ----------------------------------------------------------------
 
-    def execute_query(self, database, query):
+    def execute_query(self, database, query, monitor=None):
 
         logger.info("Database : %s", database)
         logger.info("Query    : %s", query)
@@ -40,6 +40,12 @@ class DatabaseService:
 
             result = connection.execute_query(query)
 
+            # ---------------------------------------------------------
+            # Update Monitoring Metrics
+            # ---------------------------------------------------------
+            if monitor:
+                monitor.database_query()
+
             return result
 
         except Exception as ex:
@@ -51,5 +57,4 @@ class DatabaseService:
         finally:
 
             if connection:
-
                 connection.close()

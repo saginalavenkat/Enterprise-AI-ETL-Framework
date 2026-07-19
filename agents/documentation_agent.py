@@ -7,209 +7,202 @@ Author      : Venkata
 ===============================================================================
 """
 
-from agents.base_agent import BaseAgent
-from core.logger.logger import logger
 from pathlib import Path
 from datetime import datetime
+
+from agents.base_agent import BaseAgent
+from core.logger.logger import logger
 from services.integrations.email_service import EmailService
 
+
 class DocumentationAgent(BaseAgent):
+    """
+    AI Agent responsible for generating the final ETL execution report,
+    saving it as a Markdown document, and emailing the report.
+    """
 
-    def __init__(self, rag_pipeline=None):
+    def __init__(
+            self,
+            rag_pipeline=None,
+            client=None,
+            email_service=None
+    ):
 
-        super().__init__("Documentation Agent", rag_pipeline)
+        super().__init__(
+            agent_name="Documentation Agent",
+            rag_pipeline=rag_pipeline,
+            client=client
+        )
+
+        self.email_service = email_service or EmailService()
+
         self.output_folder = Path("resources/outputs/documentation")
         self.output_folder.mkdir(parents=True, exist_ok=True)
 
-    # ------------------------------------------------------------
-    def save_markdown(self, context):
+    # ------------------------------------------------------------------
+    # Save Markdown Report
+    # ------------------------------------------------------------------
 
-        filename = datetime.now().strftime("ETL_Test_Report_%Y%m%d_%H%M%S.md")
+    def save_markdown(self, context) -> str:
+
+        filename = datetime.now().strftime(
+            "ETL_Test_Report_%Y%m%d_%H%M%S.md"
+        )
 
         report_path = self.output_folder / filename
 
         content = f"""
-    # Enterprise AI ETL Execution Report
+# Enterprise AI ETL Execution Report
 
-    ## Requirement
+## Requirement
 
-    {context.requirement}
+{context.requirement}
 
-    ## Mapping
+## Mapping
 
-    {context.mapping}
+{context.mapping}
 
-    ## Test Cases
+## Test Cases
 
-    {context.test_cases}
+{context.test_cases}
 
-    ## Test Data
+## Test Data
 
-    {context.test_data}
+{context.test_data}
 
-    ## SQL
+## SQL
 
-    {context.generated_sql}
+{context.generated_sql}
 
-    ## Validation
+## Validation
 
-    {context.validation}
+{context.validation}
 
-    ## Documentation
+## Documentation
 
-    {context.documentation}
-    
-    ## Defect Analysis
+{context.documentation}
 
-    {context.defect_analysis}
+## Defect Analysis
 
-    ## Jira Issue
+{context.defect_analysis}
 
-    {context.jira_issue}"""
+## Jira Issue
+
+{context.jira_issue}
+"""
 
         report_path.write_text(content, encoding="utf-8")
 
-        logger.info("Documentation saved : %s", report_path)
+        logger.info("Documentation saved: %s", report_path)
 
         return str(report_path)
 
-    def execute(self, context):
-        print("=" * 80)
-        print("Documentation Agent Started")
-        print("=" * 80)
+    def send_reports(self, context):
 
-        logger.info("Documentation Agent Started.")
-
-        prompt = f"""
-        Generate a professional ETL Execution Report.
-
-        Include the following sections.
-
-        ------------------------------------------------
-
-        Requirement
-
-        {context.requirement}
-
-        ------------------------------------------------
-
-        Mapping Analysis
-
-        {context.mapping}
-
-        ------------------------------------------------
-
-        Generated Test Cases
-
-        {context.test_cases}
-
-        ------------------------------------------------
-
-        Generated Test Data
-
-        {context.test_data}
-
-        ------------------------------------------------
-
-        Generated SQL
-
-        {context.generated_sql}
-
-        ------------------------------------------------
-
-        Database Result
-
-        {context.query_result}
-
-        ------------------------------------------------
-
-        Validation Summary
-
-        {context.validation}
-
-        ------------------------------------------------
-
-        Defect Analysis
-
-        {context.defect_analysis}
-
-        ------------------------------------------------
-
-        Jira Issue
-
-        {context.jira_issue}
-
-        ------------------------------------------------
-
-        Prepare a professional report suitable for management.
-        """
-        report = self.ask_llm(prompt)
-        context.metrics.add_tokens(500)
-        print("LLM Report:", report)
-
-        # Save report in workflow context
-        context.documentation = report or "Mock Documentation Generated"
-        print("Documentation Stored:", context.documentation)
-
-        # Save Markdown report and store the file path
-        context.report_file = self.save_markdown(context)
-        email_service = EmailService()
-
-        # Extract only Jira Issue Key
         jira_key = "N/A"
 
         if context.jira_issue:
 
             try:
-                jira_key = context.jira_issue.result.get("issue_key", "N/A")
+                jira_key = context.jira_issue.result.get(
+                    "issue_key",
+                    "N/A"
+                )
+
             except Exception:
+
                 jira_key = str(context.jira_issue)
 
         email_body = f"""
-        Enterprise AI ETL Framework Execution Completed
+    Enterprise AI ETL Framework Execution Completed
 
-        Requirement      : Completed
-        Test Cases       : Generated
-        SQL              : Generated
-        Validation       : Completed
-        Jira Issue       : {jira_key}
+    Workflow Status : SUCCESS
 
-        Please find the attached execution report.
+    Requirement : Completed
+    Test Cases  : Generated
+    SQL         : Generated
+    Validation  : Completed
+    Jira Issue  : {jira_key}
 
-        Regards,
-        Enterprise AI ETL Framework
-        """
+    Please find the attached reports.
 
-        email_service.send_email(to_email=email_service.report_email, subject="Enterprise AI ETL Execution Report", body=email_body, attachments=[context.report_file])
+    Regards,
+    Enterprise AI ETL Framework
+    """
+
+        attachments = []
+
+        if getattr(context, "documentation_file", None):
+            attachments.append(context.documentation_file)
+
+        if getattr(context, "report_file", None):
+            attachments.append(context.report_file)
+
+        self.email_service.send_email(
+            to_email=self.email_service.report_email,
+            subject="Enterprise AI ETL Framework - Execution Report",
+            body=email_body,
+            attachments=attachments,
+            monitor=context.monitor
+        )
+
+        logger.info("Execution reports emailed successfully.")
+
+    # ------------------------------------------------------------------
+    # Execute
+    # ------------------------------------------------------------------
+
+    def execute(self, context):
+
+        logger.info("=" * 80)
+        logger.info("Documentation Agent Started.")
+        logger.info("=" * 80)
+
+        prompt = f"""
+    Generate a professional Enterprise ETL Execution Report.
+
+    Requirement
+    {context.requirement}
+
+    Mapping Analysis
+    {context.mapping}
+
+    Generated Test Cases
+    {context.test_cases}
+
+    Generated Test Data
+    {context.test_data}
+
+    Generated SQL
+    {context.generated_sql}
+
+    Database Result
+    {context.query_result}
+
+    Validation Summary
+    {context.validation}
+
+    Defect Analysis
+    {context.defect_analysis}
+
+    Jira Issue
+    {context.jira_issue}
+
+    Prepare a professional report suitable for management.
+    """
+
+        report = self.ask_llm(
+            question=prompt,
+            context=context
+        )
+
+        context.documentation = (
+                report or "Mock Documentation Generated"
+        )
+
+        # Generate Documentation Report
+        context.documentation_file = self.save_markdown(context)
 
         logger.info("Documentation Generated Successfully.")
-        print("Documentation Agent Completed")
 
         return context
-# ------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    from core.workflows.workflow_context import WorkflowContext
-
-    agent = DocumentationAgent()
-
-    context = WorkflowContext("Generate Report")
-
-    context.requirement = "Employee Validation"
-
-    context.mapping = "EMPLOYEE Mapping"
-
-    context.test_cases = "Salary Validation"
-
-    context.test_data = "10 Sample Records"
-
-    context.generated_sql = "SELECT * FROM EMPLOYEE"
-
-    context.query_result = "10 Rows"
-
-    context.validation = "Validation Passed"
-
-    context = agent.execute(context)
-
-    print(context.to_dict())

@@ -32,18 +32,3 @@ class Retriever:
 
         return results
 
-# Testing - For now, we'll use a mock embedding because your OpenAI billing is still pending.
-
-if __name__ == "__main__":
-
-    from integrations.vectordb.chroma_db import ChromaVectorDB
-
-    vector_db = ChromaVectorDB()
-
-    mock_embedding = [0.1] * 1536
-
-    retriever = Retriever(vector_db)
-
-    results = retriever.retrieve(mock_embedding)
-
-    print(results)

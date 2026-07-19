@@ -37,8 +37,7 @@ class JiraTool(BaseTool):
             issue_type="Task",
             jql=None,
             issue_key=None,
-            comment=None
-    ):
+            comment=None, monitor=None):
 
         if action == "create_issue":
 
@@ -46,8 +45,7 @@ class JiraTool(BaseTool):
                 project=project,
                 summary=summary,
                 description=description,
-                issue_type=issue_type
-            )
+                issue_type=issue_type, monitor=monitor)
 
             return ToolResponse(
                 status="SUCCESS",

@@ -10,23 +10,21 @@ Author      : Venkata
 import snowflake.connector
 import os
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from core.logger.logger import logger
 
 from integrations.database.database_connection import DatabaseConnection
-
-SNOWFLAKE_ACCOUNT = os.getenv("SNOWFLAKE_ACCOUNT")
-SNOWFLAKE_USER = os.getenv("SNOWFLAKE_USER")
-SNOWFLAKE_PASSWORD = os.getenv("SNOWFLAKE_PASSWORD")
-SNOWFLAKE_DATABASE = os.getenv("SNOWFLAKE_DATABASE")
-SNOWFLAKE_SCHEMA = os.getenv("SNOWFLAKE_SCHEMA")
-SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE")
-SNOWFLAKE_ROLE = os.getenv("SNOWFLAKE_ROLE")
 
 class SnowflakeConnection(DatabaseConnection):
 
     def __init__(self):
 
         self.connection = None
+
+        logger.info("SnowflakeConnection Object Created : %s", id(self))
 
     # -----------------------------------------------------------------
 
@@ -36,9 +34,20 @@ class SnowflakeConnection(DatabaseConnection):
 
             logger.info("Connecting to Snowflake...")
 
-            self.connection = snowflake.connector.connect(account = SNOWFLAKE_ACCOUNT, user = SNOWFLAKE_USER, password = SNOWFLAKE_PASSWORD, warehouse = SNOWFLAKE_WAREHOUSE, database = SNOWFLAKE_DATABASE, schema = SNOWFLAKE_SCHEMA, role = SNOWFLAKE_ROLE)
+            account = os.getenv("SNOWFLAKE_ACCOUNT")
+            user = os.getenv("SNOWFLAKE_USER")
+            password = os.getenv("SNOWFLAKE_PASSWORD")
+            warehouse = os.getenv("SNOWFLAKE_WAREHOUSE")
+            database = os.getenv("SNOWFLAKE_DATABASE")
+            schema = os.getenv("SNOWFLAKE_SCHEMA")
+            role = os.getenv("SNOWFLAKE_ROLE")
+
+            self.connection = snowflake.connector.connect(account=account, user=user, password=password, warehouse=warehouse, database=database, schema=schema, role=role)
 
             logger.info("Connected to Snowflake Successfully.")
+            logger.info("Object ID      : %s", id(self))
+            logger.info("Connection Obj : %s", self.connection)
+            logger.info("Connection ID  : %s", id(self.connection))
 
             return self.connection
 
@@ -46,11 +55,16 @@ class SnowflakeConnection(DatabaseConnection):
 
             logger.exception("Failed to connect to Snowflake.")
 
-            raise ex
-
+            raise
     # -----------------------------------------------------------------
 
     def execute_query(self, query):
+
+        logger.info("Object ID       : %s", id(self))
+        logger.info("Connection Obj  : %s", self.connection)
+
+        if self.connection is None:
+            raise Exception("Connection became None before execute_query().")
 
         cursor = self.connection.cursor()
 

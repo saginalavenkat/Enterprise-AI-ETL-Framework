@@ -26,11 +26,3 @@ class RootCauseAgent(BaseAgent):
     def execute(self, question: str):
         return self.ask_llm(question)
 
-
-if __name__ == "__main__":
-
-    agent = RootCauseAgent()
-
-    response = agent.execute("Analyze the root cause of ETL data mismatches.")
-
-    print(response)

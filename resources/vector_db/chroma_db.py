@@ -45,16 +45,3 @@ class ChromaVectorDB:
 
         return self.collection.count()
 
-# Testing (Temporary) - Create a temporary test:
-
-if __name__ == "__main__":
-
-    vector_db = ChromaVectorDB()
-
-    sample_embedding = [0.1] * 1536
-
-    vector_db.add_document(document_id = "DOC_001", text = "Customer ID must be unique.", embedding = sample_embedding)
-
-    print("Total Documents :")
-
-    print(vector_db.count())

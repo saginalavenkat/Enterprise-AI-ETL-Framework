@@ -39,31 +39,11 @@ Test Cases
 Generate ETL Test Data.
 """
 
-        test_data = self.ask_llm(prompt)
-        context.metrics.add_tokens(500)
+        test_data = self.ask_llm(prompt, context)
+        context.monitor.update_tokens(500)
         context.test_data = test_data
 
         logger.info("Test Data Generated Successfully.")
 
         return context
 
-
-# ------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    from core.workflows.workflow_context import WorkflowContext
-
-    agent = TestDataAgent()
-
-    context = WorkflowContext("Generate Test Data")
-
-    context.requirement = "Employee validation"
-
-    context.mapping = "Employee Mapping"
-
-    context.test_cases = "Validate Salary"
-
-    context = agent.execute(context)
-
-    print(context.to_dict())

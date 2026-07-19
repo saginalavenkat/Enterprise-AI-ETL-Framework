@@ -43,26 +43,3 @@ class TextChunker:
         logger.info(f"Total Chunks Created : {len(chunks)}")
 
         return chunks
-
-if __name__ == "__main__":
-
-    from knowledge.rag.document_loader import DocumentLoader
-
-    loader = DocumentLoader()
-
-    text = loader.load_docx("Business_Rules.docx")
-
-    chunker = TextChunker()
-
-    chunks = chunker.split_text(text)
-
-    for index, chunk in enumerate(chunks, start=1):
-
-        print("=" * 80)
-
-        print(f"Chunk {index}")
-
-        print("=" * 80)
-
-        print(chunk)
-

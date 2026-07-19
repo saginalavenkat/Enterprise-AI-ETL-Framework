@@ -15,7 +15,7 @@ load_dotenv()
 
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
+from core.logger.logger import logger
 
 class EmailService:
 
@@ -37,7 +37,7 @@ class EmailService:
 
     # ------------------------------------------------------------------
 
-    def send_email(self, to_email, subject, body, attachments=None):
+    def send_email(self, to_email, subject, body, attachments=None, monitor=None):
 
         try:
 
@@ -61,19 +61,34 @@ class EmailService:
 
             if attachments:
 
+                logger.info("=" * 60)
+                logger.info("Email Attachments")
+                logger.info("=" * 60)
+
                 for file_path in attachments:
 
+                    logger.info(f"Attaching : {file_path}")
+
                     if os.path.exists(file_path):
+
                         with open(file_path, "rb") as attachment:
+
                             part = MIMEBase("application", "octet-stream")
 
                             part.set_payload(attachment.read())
 
                         encoders.encode_base64(part)
 
-                        part.add_header("Content-Disposition", f'attachment; filename="{os.path.basename(file_path)}"')
+                        part.add_header(
+                            "Content-Disposition",
+                            f'attachment; filename="{os.path.basename(file_path)}"'
+                        )
 
                         msg.attach(part)
+
+                    else:
+
+                        logger.warning(f"Attachment not found : {file_path}")
 
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
 
@@ -84,6 +99,9 @@ class EmailService:
                 server.send_message(msg)
 
             print("Email sent successfully.")
+
+            if monitor:
+                monitor.email_sent()
 
             return True
 

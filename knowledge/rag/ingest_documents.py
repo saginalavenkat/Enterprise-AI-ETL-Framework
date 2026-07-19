@@ -14,7 +14,7 @@ from core.logger.logger import logger
 from knowledge.rag.document_loader import DocumentLoader
 from knowledge.rag.chunking import TextChunker
 from knowledge.rag.embeddings import EmbeddingGenerator
-from integrations.vectordb.chroma_db import ChromaVectorDB
+from resources.vector_db.chroma_db import ChromaVectorDB
 
 
 class DocumentIngestion:
@@ -86,11 +86,3 @@ class DocumentIngestion:
             logger.info(f"Stored {document_id}")
 
         logger.info(f"Completed : {file_name}")
-
-# Testing code
-
-if __name__ == "__main__":
-
-    ingestion = DocumentIngestion()
-
-    ingestion.ingest_document("Business_Rules.docx")

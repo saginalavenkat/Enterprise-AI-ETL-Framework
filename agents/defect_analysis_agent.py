@@ -21,8 +21,6 @@ class DefectAnalysisAgent(BaseAgent):
 
         super().__init__("Defect Analysis Agent", rag_pipeline)
 
-        logger.info("Defect Analysis Agent Initialized.")
-
     # -----------------------------------------------------------------
 
     def execute(self, context):
@@ -79,8 +77,8 @@ Generate:
 Return concise enterprise output.
 """
 
-        analysis = self.ask_llm(prompt)
-        context.metrics.add_tokens(500)
+        analysis = self.ask_llm(prompt, context)
+        context.monitor.update_tokens(500)
         # ------------------------------------------------------------
         # Store structured result
         # ------------------------------------------------------------
@@ -102,36 +100,3 @@ Return concise enterprise output.
         return context
 
 
-# --------------------------------------------------------------------
-# Testing
-# --------------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    from core.workflows.workflow_context import WorkflowContext
-
-    context = WorkflowContext("Employee Validation")
-
-    context.requirement = "Validate Employee Salary"
-
-    context.generated_sql = (
-        "SELECT * FROM EMPLOYEE WHERE SALARY > 90000"
-    )
-
-    context.query_result = "2 Records Returned"
-
-    context.validation = "Validation Failed"
-
-    agent = DefectAnalysisAgent()
-
-    context = agent.execute(context)
-
-    print()
-
-    print("=" * 80)
-
-    print("DEFECT ANALYSIS")
-
-    print("=" * 80)
-
-    print(context.to_dict())

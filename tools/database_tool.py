@@ -27,7 +27,7 @@ class DatabaseTool(BaseTool):
 
     # ----------------------------------------------------------------
 
-    def execute(self, database, query):
+    def execute(self, database, query, monitor=None):
 
         logger.info(f"Executing Query on {database}")
 
@@ -35,7 +35,7 @@ class DatabaseTool(BaseTool):
 
         try:
 
-            rows = self.database_service.execute_query(database, query)
+            rows = self.database_service.execute_query(database, query, monitor)
 
             execution_time = round(time.time() - start_time, 2)
 

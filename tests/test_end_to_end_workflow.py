@@ -6,14 +6,10 @@ Purpose     : End-to-End AI Workflow Test
 ===============================================================================
 """
 
-from core.monitoring.monitor import FrameworkMonitor
 from core.workflows.workflow_manager import WorkflowManager
 
 
 def test_end_to_end_workflow():
-
-    monitor = FrameworkMonitor()
-    monitor.start()
 
     question = """
     Validate Employee ETL Load.
@@ -36,9 +32,11 @@ def test_end_to_end_workflow():
 
     context = manager.execute(question)
 
-    monitor.stop()
-    monitor.save_metrics()
-    monitor.display_metrics()
-
     assert context is not None
+    assert context.requirement is not None
+    assert context.mapping is not None
+    assert context.test_cases is not None
+    assert context.test_data is not None
+    assert context.generated_sql is not None
+    assert context.validation is not None
     assert context.documentation is not None

@@ -36,14 +36,3 @@ class EmbeddingGenerator:
 
         return embedding
 
-# Testing the above code
-
-if __name__ == "__main__":
-
-    embedding_generator = EmbeddingGenerator()
-
-    vector = embedding_generator.generate_embedding("Customer ID must be unique.") # this line we use when we have billing for OpenAI API if not use - sample_embedding = [0.1] * 1536
-
-    sample_embedding = [0.1] * 1536
-
-    print(vector[:10])

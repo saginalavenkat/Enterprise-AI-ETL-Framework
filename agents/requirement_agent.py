@@ -13,42 +13,25 @@ from core.logger.logger import logger
 
 class RequirementAgent(BaseAgent):
     """
-    AI Agent for Requirement Analysis.
+    AI Agent responsible for Requirement Analysis.
     """
 
-    def __init__(self, rag_pipeline=None):
+    def __init__(self, rag_pipeline=None, client=None):
 
-        super().__init__("Requirement Agent", rag_pipeline)
+        super().__init__(agent_name="Requirement Agent", rag_pipeline=rag_pipeline, client=client)
 
-    # ------------------------------------------------------------
+    # ------------------------------------------------------------------
 
     def execute(self, context):
 
+        logger.info("=" * 80)
         logger.info("Requirement Agent Started.")
+        logger.info("=" * 80)
 
-        requirement = self.ask_llm(context.question)
-        context.metrics.add_tokens(500)
+        requirement = self.ask_llm(question=context.question, context=context)
+
         context.requirement = requirement
 
         logger.info("Requirement Analysis Completed.")
 
         return context
-
-
-# ------------------------------------------------------------
-# Testing
-# ------------------------------------------------------------
-
-if __name__ == "__main__":
-
-    from core.workflows.workflow_context import WorkflowContext
-
-    agent = RequirementAgent()
-
-    context = WorkflowContext(
-        "Show employees working in IT department earning above 90000."
-    )
-
-    context = agent.execute(context)
-
-    print(context.to_dict())
