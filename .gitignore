@@ -122,3 +122,11 @@ dist/
 
 practice.py
 test_jira_connection.py
+
+
+# Reports
+reports/execution_reports/
+
+# ChromaDB
+resources/vectordb/chroma_storage/
+
